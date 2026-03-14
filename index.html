@@ -2,49 +2,43 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Asistencia - Casino La Rioja</title>
+    <title>Casino La Rioja - Asistencia</title>
     <style>
-        body { font-family: Arial; background: #141414; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: #000; padding: 40px; border: 2px solid red; border-radius: 15px; text-align: center; width: 350px; }
-        input { width: 100%; padding: 12px; margin: 20px 0; border-radius: 5px; border: none; font-size: 16px; }
-        button { width: 100%; padding: 12px; background: red; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        #mensaje { margin-top: 20px; font-weight: bold; min-height: 20px; }
+        body { background: #000; color: white; font-family: 'Segoe UI', sans-serif; height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; }
+        .card { border: 2px solid red; background: #0a0a0a; padding: 50px; border-radius: 20px; text-align: center; width: 380px; box-shadow: 0 0 20px rgba(255,0,0,0.2); }
+        h1 { color: red; letter-spacing: 2px; margin-bottom: 30px; }
+        input { width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #333; background: #111; color: white; font-size: 18px; text-align: center; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; background: red; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #8b0000; transform: scale(1.02); }
+        #res { margin-top: 25px; font-weight: bold; min-height: 24px; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h2 style="color: red;">CASINO LA RIOJA</h2>
-        <p>Ingrese su Identificación</p>
-        <input type="text" id="dni" placeholder="Número de documento">
-        <button onclick="validar()">VERIFICAR</button>
-        <div id="mensaje"></div>
+        <h1>CASINO LA RIOJA</h1>
+        <p>CONTROL DE ASISTENCIA</p>
+        <input type="text" id="dni" placeholder="Identificación">
+        <button onclick="marcar()">REGISTRAR ENTRADA</button>
+        <div id="res"></div>
     </div>
 
     <script>
-        async function validar() {
-            const dni = document.getElementById('dni').value;
-            const resDiv = document.getElementById('mensaje');
-            
+        async function marcar() {
+            const dniVal = document.getElementById('dni').value;
+            const resDiv = document.getElementById('res');
             try {
                 const response = await fetch('http://localhost:5000/validar', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({identificacion: dni})
+                    body: JSON.stringify({identificacion: dniVal})
                 });
                 const data = await response.json();
-                
-                if(data.status === 'success') {
-                    resDiv.style.color = "lime";
-                    resDiv.innerText = data.message;
-                } else {
-                    resDiv.style.color = "orange";
-                    resDiv.innerText = data.message;
-                    // Redirigir si no existe (crea un registro.html si lo deseas)
-                    // setTimeout(() => window.location.href = "registro.html", 2000);
-                }
+                resDiv.innerText = data.message;
+                resDiv.style.color = data.status === 'success' ? '#00FF00' : '#FF4444';
+                document.getElementById('dni').value = ""; // Limpiar
             } catch (e) {
-                resDiv.style.color = "red";
-                resDiv.innerText = "Error: El servidor no está activo.";
+                resDiv.innerText = "Error de conexión con el servidor.";
+                resDiv.style.color = "orange";
             }
         }
     </script>
