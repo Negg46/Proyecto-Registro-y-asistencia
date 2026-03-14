@@ -2,55 +2,51 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Registro Local</title>
+    <title>Asistencia - Casino La Rioja</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 600px; }
-        h1 { color: #1a73e8; margin-bottom: 20px; }
-        input[type="text"] { width: 70%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px; outline: none; }
-        input[type="text"]:focus { border-color: #1a73e8; }
-        button { padding: 12px 20px; background: #1a73e8; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        button:hover { background: #1557b0; }
-        table { width: 100%; margin-top: 30px; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; }
-        th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
-        th { background-color: #f8f9fa; color: #555; }
-        .status-msg { margin-top: 15px; font-weight: bold; padding: 10px; border-radius: 5px; }
+        body { font-family: Arial; background: #141414; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: #000; padding: 40px; border: 2px solid red; border-radius: 15px; text-align: center; width: 350px; }
+        input { width: 100%; padding: 12px; margin: 20px 0; border-radius: 5px; border: none; font-size: 16px; }
+        button { width: 100%; padding: 12px; background: red; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        #mensaje { margin-top: 20px; font-weight: bold; min-height: 20px; }
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <h1>Control de Ingreso</h1>
-        
-        <form action="/escanear" method="POST">
-            <input type="text" name="cedula" id="cedulaInput" placeholder="Escanee o digite cédula" autofocus required>
-            <button type="submit">Validar</button>
-        </form>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Cédula Registrada</th>
-                    <th>Hora de Ingreso</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for r in registros %}
-                <tr>
-                    <td><strong>{{ r.cedula_cliente }}</strong></td>
-                    <td>{{ r.fecha_hora.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="card">
+        <h2 style="color: red;">CASINO LA RIOJA</h2>
+        <p>Ingrese su Identificación</p>
+        <input type="text" id="dni" placeholder="Número de documento">
+        <button onclick="validar()">VERIFICAR</button>
+        <div id="mensaje"></div>
     </div>
 
     <script>
-        // Mantiene el foco en el input siempre para escaneos rápidos
-        document.addEventListener('click', () => {
-            document.getElementById('cedulaInput').focus();
-        });
+        async function validar() {
+            const dni = document.getElementById('dni').value;
+            const resDiv = document.getElementById('mensaje');
+            
+            try {
+                const response = await fetch('http://localhost:5000/validar', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({identificacion: dni})
+                });
+                const data = await response.json();
+                
+                if(data.status === 'success') {
+                    resDiv.style.color = "lime";
+                    resDiv.innerText = data.message;
+                } else {
+                    resDiv.style.color = "orange";
+                    resDiv.innerText = data.message;
+                    // Redirigir si no existe (crea un registro.html si lo deseas)
+                    // setTimeout(() => window.location.href = "registro.html", 2000);
+                }
+            } catch (e) {
+                resDiv.style.color = "red";
+                resDiv.innerText = "Error: El servidor no está activo.";
+            }
+        }
     </script>
 </body>
 </html>
