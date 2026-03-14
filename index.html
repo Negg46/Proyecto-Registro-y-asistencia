@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Asistencia - Casino La Rioja</title>
+    <style>
+        /* Estilo fusionado: Moderno y con Feedback visual */
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            background: #141414; 
+            color: white; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+        }
+        .card { 
+            background: #000; 
+            padding: 40px; 
+            border: 2px solid red; 
+            border-radius: 15px; 
+            text-align: center; 
+            width: 350px; 
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.2); /* Efecto neón suave */
+        }
+        h2 { color: red; letter-spacing: 2px; margin-bottom: 5px; }
+        p { color: #ccc; font-size: 14px; margin-bottom: 25px; }
+        
+        input { 
+            width: 100%; 
+            padding: 15px; 
+            margin-bottom: 20px; 
+            border-radius: 8px; 
+            border: 1px solid #333; 
+            background: #111; 
+            color: white; 
+            font-size: 18px; 
+            text-align: center; 
+            box-sizing: border-box; 
+            transition: 0.3s;
+        }
+        input:focus { border-color: red; outline: none; background: #1a1a1a; }
+        
+        button { 
+            width: 100%; 
+            padding: 15px; 
+            background: red; 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 16px;
+            transition: 0.3s; 
+        }
+        button:hover { background: #8b0000; transform: scale(1.02); }
+        button:active { transform: scale(0.98); }
+
+        #mensaje { 
+            margin-top: 25px; 
+            font-weight: bold; 
+            min-height: 24px; 
+            font-size: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>CASINO LA RIOJA</h2>
+        <p>CONTROL DE ASISTENCIA</p>
+        
+        <input type="text" id="dni" placeholder="Número de documento" autocomplete="off">
+        <button onclick="validar()">VERIFICAR ENTRADA</button>
+        
+        <div id="mensaje"></div>
+    </div>
+
+    <script>
+        // 1. Manejo Dinámico de la URL (API_BASE)
+        const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:5000'
+            : 'https://tu-backend-produccion.com'; // Ajustar para despliegue real
+
+        async function validar() {
+            const dniInput = document.getElementById('dni');
+            const dni = dniInput.value;
+            const resDiv = document.getElementById('mensaje');
+            
+            if (!dni) {
+                resDiv.style.color = "orange";
+                resDiv.innerText = "Por favor, ingrese un documento.";
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/validar`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({identificacion: dni})
+                });
+                
+                const data = await response.json();
+                
+                // 2. Experiencia de Usuario y Feedback
+                if(data.status === 'success') {
+                    resDiv.style.color = "lime";
+                    resDiv.innerText = data.message;
+                    
+                    // Limpieza automática para el siguiente cliente
+                    setTimeout(() => {
+                        dniInput.value = "";
+                        resDiv.innerText = "";
+                    }, 4000); 
+
+                } else {
+                    resDiv.style.color = "orange";
+                    resDiv.innerText = data.message;
+                    
+                    // Si no existe, sugerir registro después de 2 segundos
+                    setTimeout(() => {
+                        if(confirm("El cliente no existe. ¿Desea ir al formulario de registro?")) {
+                            // Aquí puedes cambiar a la URL de tu pestaña de registro si fuera externa
+                            console.log("Redirigiendo a registro...");
+                        }
+                    }, 2000);
+                }
+            } catch (e) {
+                resDiv.style.color = "red";
+                resDiv.innerText = "Error: El servidor no responde.";
+            }
+        }
+
+        // Permitir marcar entrada al presionar "Enter"
+        document.getElementById('dni').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                validar();
+            }
+        });
+    </script>
+</body>
+</html>
