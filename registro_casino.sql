@@ -1,161 +1,133 @@
--- phpMyAdmin SQL Dump
--- version 5.2.1
--- https://www.phpmyadmin.net/
---
--- Servidor: 127.0.0.1:3306
--- Tiempo de generación: 10-03-2026 a las 22:25:46
--- Versión del servidor: 9.1.0
--- Versión de PHP: 8.3.14
-
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
 
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS asistencias;
+DROP TABLE IF EXISTS clientes;
+SET FOREIGN_KEY_CHECKS = 1;
 
---
--- Base de datos: `registro_casino`
---
+CREATE TABLE clientes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    dni VARCHAR(20) NOT NULL UNIQUE,
+    telefono VARCHAR(20),
+    email VARCHAR(100),
+    fecha_nacimiento DATE,
+    nivel VARCHAR(20) NOT NULL DEFAULT 'Clasica',
+    tarjeta VARCHAR(50) NOT NULL,
+    asistencias_dias INT DEFAULT 0
+) ENGINE=InnoDB;
 
--- --------------------------------------------------------
+CREATE TABLE asistencias (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    cliente_id INT NOT NULL,
+    fecha DATE NOT NULL,
+    hora TIME NOT NULL,
+    CONSTRAINT fk_asistencias_clientes
+        FOREIGN KEY (cliente_id) REFERENCES clientes(id)
+        ON DELETE CASCADE,
+    INDEX idx_asistencias_fecha (fecha),
+    INDEX idx_asistencias_cliente (cliente_id)
+) ENGINE=InnoDB;
 
---
--- Estructura de tabla para la tabla `clientes`
---
+INSERT INTO clientes (id, nombre, dni, telefono, email, fecha_nacimiento, nivel, tarjeta, asistencias_dias) VALUES
+(1, 'Juan Miguel Carreno', '1097493234', '3242253587', 'juanmiguel@correo.com', '2006-04-22', 'Clasica', '54165423', 4),
+(2, 'Maria Gonzalez', '1234567890', '3001234567', 'maria@example.com', '1990-05-15', 'VIP', '12345678', 16),
+(3, 'Carlos Rodriguez', '0987654321', '3019876543', 'carlos@example.com', '1985-08-20', 'Clasica', '98765432', 5),
+(4, 'Ana Lopez', '1122334455', '3021122334', 'ana@example.com', '1995-12-10', 'VIP', '11223344', 15),
+(5, 'Pedro Sanchez', '5566778899', '3035566778', 'pedro@example.com', '1980-03-25', 'Clasica', '55667788', 3),
+(6, 'Laura Martinez', '6677889900', '3046677889', 'laura@example.com', '1992-07-30', 'VIP', '66778899', 17),
+(7, 'Diego Fernandez', '7788990011', '3057788990', 'diego@example.com', '1988-11-05', 'Clasica', '77889900', 3),
+(8, 'Sofia Ramirez', '8899001122', '3068899001', 'sofia@example.com', '1998-01-18', 'Clasica', '88990011', 3),
+(9, 'Javier Torres', '9900112233', '3079900112', 'javier@example.com', '1975-09-12', 'Clasica', '99001122', 4),
+(10, 'Elena Morales', '0011223344', '3080011223', 'elena@example.com', '1993-04-08', 'Clasica', '00112233', 4);
 
-DROP TABLE IF EXISTS `asistencias`;
-DROP TABLE IF EXISTS `clientes`;
-CREATE TABLE IF NOT EXISTS `clientes` (
-  `Id_Cliente` int NOT NULL AUTO_INCREMENT,
-  `Nombre_Completo` varchar(150) NOT NULL,
-  `Numero_Identificacion` varchar(20) NOT NULL,
-  `Telefono` varchar(20) DEFAULT NULL,
-  `Correo_Electronico` varchar(100) DEFAULT NULL,
-  `Fecha_Nacimiento` date DEFAULT NULL,
-  `Nivel_Cliente` enum('Clasica','VIP') NOT NULL,
-  `Numero_Tarjeta` varchar(20) NOT NULL,
-  `Fecha_Registro` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `Fecha_VIP` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`Id_Cliente`),
-  UNIQUE KEY `Numero_Identificacion` (`Numero_Identificacion`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+INSERT INTO asistencias (cliente_id, fecha, hora) VALUES
+(1, '2026-03-17', '09:12:00'),
+(1, '2026-03-17', '14:48:00'),
+(1, '2026-03-16', '10:05:00'),
+(1, '2026-03-15', '12:25:00'),
+(1, '2026-03-13', '18:10:00'),
 
---
--- Estructura de tabla para la tabla `asistencias`
---
-CREATE TABLE IF NOT EXISTS `asistencias` (
-  `Id_Asistencia` int NOT NULL AUTO_INCREMENT,
-  `Id_Cliente` int NOT NULL,
-  `Fecha_Asistencia` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`Id_Asistencia`),
-  KEY `Id_Cliente` (`Id_Cliente`),
-  CONSTRAINT `fk_asistencias_clientes` FOREIGN KEY (`Id_Cliente`) REFERENCES `clientes` (`Id_Cliente`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+(2, '2026-03-17', '08:40:00'),
+(2, '2026-03-17', '16:05:00'),
+(2, '2026-03-16', '09:20:00'),
+(2, '2026-03-15', '09:35:00'),
+(2, '2026-03-14', '10:15:00'),
+(2, '2026-03-13', '11:10:00'),
+(2, '2026-03-12', '18:40:00'),
+(2, '2026-03-11', '20:00:00'),
+(2, '2026-03-10', '17:35:00'),
+(2, '2026-03-09', '16:10:00'),
+(2, '2026-03-08', '19:05:00'),
+(2, '2026-03-07', '13:30:00'),
+(2, '2026-03-06', '14:50:00'),
+(2, '2026-03-05', '15:40:00'),
+(2, '2026-03-04', '21:05:00'),
+(2, '2026-03-03', '22:10:00'),
+(2, '2026-03-02', '10:45:00'),
 
---
--- Volcado de datos para la tabla `clientes`
---
+(3, '2026-03-17', '11:20:00'),
+(3, '2026-03-15', '13:15:00'),
+(3, '2026-03-13', '15:10:00'),
+(3, '2026-03-11', '16:25:00'),
+(3, '2026-03-09', '18:05:00'),
 
-INSERT INTO `clientes` (`Id_Cliente`, `Nombre_Completo`, `Numero_Identificacion`, `Telefono`, `Correo_Electronico`, `Fecha_Nacimiento`, `Nivel_Cliente`, `Numero_Tarjeta`, `Fecha_Registro`) VALUES
-(1, 'Juan Miguel Carreño', '1097493234', '3242253587', 'juanmiguel@correo.com', '2006-04-22', 'Clasica', '54165423156', '2026-03-10 22:16:58'),
-(2, 'María González', '1234567890', '3001234567', 'maria@example.com', '1990-05-15', 'Clasica', '123456789012', '2026-03-11 10:00:00'),
-(3, 'Carlos Rodríguez', '0987654321', '3019876543', 'carlos@example.com', '1985-08-20', 'Clasica', '987654321098', '2026-03-11 11:30:00'),
-(4, 'Ana López', '1122334455', '3021122334', 'ana@example.com', '1995-12-10', 'Clasica', '112233445566', '2026-03-11 12:00:00'),
-(5, 'Pedro Sánchez', '5566778899', '3035566778', 'pedro@example.com', '1980-03-25', 'Clasica', '556677889900', '2026-03-11 13:15:00'),
-(6, 'Laura Martínez', '6677889900', '3046677889', 'laura@example.com', '1992-07-30', 'Clasica', '667788990011', '2026-03-11 14:45:00'),
-(7, 'Diego Fernández', '7788990011', '3057788990', 'diego@example.com', '1988-11-05', 'Clasica', '778899001122', '2026-03-11 15:20:00'),
-(8, 'Sofia Ramírez', '8899001122', '3068899001', 'sofia@example.com', '1998-01-18', 'Clasica', '889900112233', '2026-03-11 16:00:00'),
-(9, 'Javier Torres', '9900112233', '3079900112', 'javier@example.com', '1975-09-12', 'Clasica', '990011223344', '2026-03-11 17:30:00'),
-(10, 'Elena Morales', '0011223344', '3080011223', 'elena@example.com', '1993-04-08', 'Clasica', '001122334455', '2026-03-11 18:00:00');
+(4, '2026-03-17', '10:30:00'),
+(4, '2026-03-16', '17:20:00'),
+(4, '2026-03-15', '19:10:00'),
+(4, '2026-03-14', '20:30:00'),
+(4, '2026-03-13', '22:00:00'),
+(4, '2026-03-12', '18:45:00'),
+(4, '2026-03-11', '17:10:00'),
+(4, '2026-03-10', '16:15:00'),
+(4, '2026-03-09', '15:00:00'),
+(4, '2026-03-08', '14:20:00'),
+(4, '2026-03-07', '13:10:00'),
+(4, '2026-03-06', '12:40:00'),
+(4, '2026-03-05', '11:50:00'),
+(4, '2026-03-04', '10:10:00'),
+(4, '2026-03-03', '09:15:00'),
 
---
--- Volcado de datos para la tabla `asistencias`
---
+(5, '2026-03-17', '18:35:00'),
+(5, '2026-03-14', '20:00:00'),
+(5, '2026-03-10', '19:15:00'),
 
-INSERT INTO `asistencias` (`Id_Asistencia`, `Id_Cliente`, `Fecha_Asistencia`) VALUES
--- Cliente 2: 16 asistencias en marzo 2026 → Debería ser VIP
-(1, 2, '2026-03-01 09:00:00'),
-(2, 2, '2026-03-02 10:00:00'),
-(3, 2, '2026-03-03 11:00:00'),
-(4, 2, '2026-03-04 12:00:00'),
-(5, 2, '2026-03-05 13:00:00'),
-(6, 2, '2026-03-06 14:00:00'),
-(7, 2, '2026-03-07 15:00:00'),
-(8, 2, '2026-03-08 16:00:00'),
-(9, 2, '2026-03-09 17:00:00'),
-(10, 2, '2026-03-10 18:00:00'),
-(11, 2, '2026-03-11 19:00:00'),
-(12, 2, '2026-03-12 20:00:00'),
-(13, 2, '2026-03-13 21:00:00'),
-(14, 2, '2026-03-14 22:00:00'),
-(15, 2, '2026-03-15 23:00:00'),
-(16, 2, '2026-03-16 08:00:00'),
+(6, '2026-03-17', '07:55:00'),
+(6, '2026-03-17', '23:10:00'),
+(6, '2026-03-16', '08:15:00'),
+(6, '2026-03-15', '09:00:00'),
+(6, '2026-03-14', '09:40:00'),
+(6, '2026-03-13', '10:20:00'),
+(6, '2026-03-12', '11:00:00'),
+(6, '2026-03-11', '12:10:00'),
+(6, '2026-03-10', '13:30:00'),
+(6, '2026-03-09', '14:05:00'),
+(6, '2026-03-08', '15:15:00'),
+(6, '2026-03-07', '16:25:00'),
+(6, '2026-03-06', '17:40:00'),
+(6, '2026-03-05', '18:10:00'),
+(6, '2026-03-04', '19:00:00'),
+(6, '2026-03-03', '20:15:00'),
+(6, '2026-03-02', '21:30:00'),
+(6, '2026-03-01', '22:05:00'),
 
--- Cliente 3: 10 asistencias en marzo → Clásica
-(17, 3, '2026-03-01 09:30:00'),
-(18, 3, '2026-03-02 10:30:00'),
-(19, 3, '2026-03-03 11:30:00'),
-(20, 3, '2026-03-04 12:30:00'),
-(21, 3, '2026-03-05 13:30:00'),
-(22, 3, '2026-03-06 14:30:00'),
-(23, 3, '2026-03-07 15:30:00'),
-(24, 3, '2026-03-08 16:30:00'),
-(25, 3, '2026-03-09 17:30:00'),
-(26, 3, '2026-03-10 18:30:00'),
+(7, '2026-03-17', '12:10:00'),
+(7, '2026-03-16', '18:30:00'),
+(7, '2026-03-12', '20:20:00'),
 
--- Cliente 4: 15 asistencias en marzo → VIP
-(27, 4, '2026-03-01 10:00:00'),
-(28, 4, '2026-03-02 11:00:00'),
-(29, 4, '2026-03-03 12:00:00'),
-(30, 4, '2026-03-04 13:00:00'),
-(31, 4, '2026-03-05 14:00:00'),
-(32, 4, '2026-03-06 15:00:00'),
-(33, 4, '2026-03-07 16:00:00'),
-(34, 4, '2026-03-08 17:00:00'),
-(35, 4, '2026-03-09 18:00:00'),
-(36, 4, '2026-03-10 19:00:00'),
-(37, 4, '2026-03-11 20:00:00'),
-(38, 4, '2026-03-12 21:00:00'),
-(39, 4, '2026-03-13 22:00:00'),
-(40, 4, '2026-03-14 23:00:00'),
-(41, 4, '2026-03-15 00:00:00'),
+(8, '2026-03-17', '13:45:00'),
+(8, '2026-03-15', '15:50:00'),
+(8, '2026-03-11', '18:25:00'),
 
--- Cliente 5: 5 asistencias → Clásica
-(42, 5, '2026-03-01 12:00:00'),
-(43, 5, '2026-03-02 13:00:00'),
-(44, 5, '2026-03-03 14:00:00'),
-(45, 5, '2026-03-04 15:00:00'),
-(46, 5, '2026-03-05 16:00:00'),
+(9, '2026-03-16', '11:15:00'),
+(9, '2026-03-15', '11:45:00'),
+(9, '2026-03-14', '12:15:00'),
+(9, '2026-03-13', '12:45:00'),
 
--- Cliente 6: 20 asistencias → VIP
-(47, 6, '2026-03-01 08:00:00'),
-(48, 6, '2026-03-02 09:00:00'),
-(49, 6, '2026-03-03 10:00:00'),
-(50, 6, '2026-03-04 11:00:00'),
-(51, 6, '2026-03-05 12:00:00'),
-(52, 6, '2026-03-06 13:00:00'),
-(53, 6, '2026-03-07 14:00:00'),
-(54, 6, '2026-03-08 15:00:00'),
-(55, 6, '2026-03-09 16:00:00'),
-(56, 6, '2026-03-10 17:00:00'),
-(57, 6, '2026-03-11 18:00:00'),
-(58, 6, '2026-03-12 19:00:00'),
-(59, 6, '2026-03-13 20:00:00'),
-(60, 6, '2026-03-14 21:00:00'),
-(61, 6, '2026-03-15 22:00:00'),
-(62, 6, '2026-03-16 23:00:00'),
-(63, 6, '2026-03-17 00:00:00'),
-(64, 6, '2026-03-18 01:00:00'),
-(65, 6, '2026-03-19 02:00:00'),
-(66, 6, '2026-03-20 03:00:00');
+(10, '2026-03-17', '17:05:00'),
+(10, '2026-03-16', '17:40:00'),
+(10, '2026-03-15', '18:20:00'),
+(10, '2026-03-14', '19:00:00');
 
--- Actualizar niveles VIP basados en asistencias (simulando la lógica automática)
-UPDATE clientes SET Nivel_Cliente = 'VIP', Fecha_VIP = '2026-03-16 08:00:00' WHERE Id_Cliente = 2; -- 16 asistencias
-UPDATE clientes SET Nivel_Cliente = 'VIP', Fecha_VIP = '2026-03-15 00:00:00' WHERE Id_Cliente = 4; -- 15 asistencias
-UPDATE clientes SET Nivel_Cliente = 'VIP', Fecha_VIP = '2026-03-20 03:00:00' WHERE Id_Cliente = 6; -- 20 asistencias
-
-COMMIT;
+ALTER TABLE clientes AUTO_INCREMENT = 11;
+ALTER TABLE asistencias AUTO_INCREMENT = 67;

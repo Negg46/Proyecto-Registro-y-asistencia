@@ -1,5 +1,11 @@
-flask
-flask-cors
+# Dependencias del proyecto
+# Nota: tkinter viene incluido con Python (asegúrate de instalar Python con soporte GUI)
+
 customtkinter
-Pillow
+Flask
+Flask-Cors
 mysql-connector-python
+Pillow
+openpyxl
+reportlab
+gunicorn

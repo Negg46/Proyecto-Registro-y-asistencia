@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Casino La Rioja | Dashboard</title>
+<style>
+:root {
+  --bg:       #08090d;
+  --panel:    #111318;
+  --panel2:   #171a21;
+  --panel3:   #1d212a;
+  --border:   rgba(255,255,255,0.08);
+  --text:     #f2f4f7;
+  --muted:    #98a2b3;
+  --accent:   #c71f37;
+  --accent2:  #94162b;
+  --gold:     #d9b15f;
+  --ok:       #6fd3c1;
+  --info:     #7bb4ff;
+  --error:    #ff6a6a;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ──────── TOPBAR ──────── */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 28px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.topbar-brand {
+  font-family: "Bahnschrift","Segoe UI",sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: .04em;
+}
+.topbar-actions { display: flex; gap: 10px; align-items: center; }
+.btn {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: "Bahnschrift","Segoe UI",sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  transition: filter .18s, transform .15s;
+}
+.btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+.btn-accent { background: var(--accent); color: #fff; }
+.btn-ghost {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover { color: var(--text); background: var(--panel2); }
+.btn-sm { padding: 6px 14px; font-size: 13px; }
+.btn-gold { background: #8a6920; color: #fff; }
+.btn-info { background: #2855a0; color: #fff; }
+
+/* ──────── LAYOUT ──────── */
+.container {
+  max-width: 1520px;
+  margin: 0 auto;
+  padding: 24px 24px 40px;
+}
+.page-title {
+  font-family: "Bahnschrift","Segoe UI",sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.page-subtitle { color: var(--muted); font-size: 14px; margin-bottom: 26px; }
+
+/* ──────── METRICS ──────── */
+.metrics-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+@media(max-width:900px){ .metrics-row { grid-template-columns: repeat(2,1fr); } }
+.metric-card {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 22px 22px 18px;
+}
+.metric-label { color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
+.metric-value { font-family: "Bahnschrift","Segoe UI",sans-serif; font-size: 40px; font-weight: 700; line-height: 1; margin-bottom: 6px; }
+.metric-desc { color: var(--muted); font-size: 12px; }
+
+/* ──────── MAIN GRID ──────── */
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 360px 400px;
+  gap: 16px;
+  align-items: start;
+}
+@media(max-width:1200px){ .main-grid { grid-template-columns: 1fr 360px; } }
+@media(max-width:800px){ .main-grid { grid-template-columns: 1fr; } }
+
+/* ──────── CARDS ──────── */
+.card {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 22px;
+  overflow: hidden;
+}
+.card-title {
+  font-family: "Bahnschrift","Segoe UI",sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.card-sub { color: var(--muted); font-size: 12px; margin-bottom: 16px; }
+
+/* ──────── CHART ──────── */
+canvas#grafico {
+  width: 100%;
+  height: 220px;
+  display: block;
+  border-radius: 12px;
+  background: #0d1016;
+  margin-bottom: 14px;
+}
+
+/* ──────── TABLE ──────── */
+.tabla-wrap { overflow-y: auto; max-height: 220px; border-radius: 14px; background: #0d1016; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 10px 14px; text-align: left; font-size: 13px; }
+th { color: var(--text); font-weight: 700; background: var(--panel3); position: sticky; top: 0; }
+td { color: var(--muted); border-bottom: 1px solid rgba(255,255,255,0.04); }
+td.highlight-gold { color: var(--gold); font-weight: 700; }
+td.highlight-info { color: var(--info); font-weight: 700; }
+tr:last-child td { border-bottom: none; }
+
+/* ──────── LIST ITEMS ──────── */
+.item-list { overflow-y: auto; }
+.item-list.h200 { max-height: 200px; }
+.item-list.h240 { max-height: 240px; }
+
+.list-item {
+  background: var(--panel3);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: border-color .18s, background .18s;
+}
+.list-item:hover, .list-item.active {
+  border-color: var(--accent);
+  background: rgba(199,31,55,0.12);
+}
+.list-item-title { font-size: 13px; font-weight: 700; color: var(--text); }
+.list-item-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  margin-left: 6px;
+}
+.badge-vip { background: rgba(217,177,95,0.2); color: var(--gold); }
+.badge-clasica { background: rgba(123,180,255,0.2); color: var(--info); }
+
+/* ──────── SEARCH ──────── */
+.search-row { display: flex; gap: 8px; margin-bottom: 12px; }
+.search-input {
+  flex: 1;
+  height: 42px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: #0d1016;
+  color: var(--text);
+  font-size: 14px;
+  padding: 0 14px;
+  outline: none;
+  transition: border-color .18s;
+}
+.search-input:focus { border-color: rgba(199,31,55,.6); }
+
+/* ──────── CLIENT DETAIL ──────── */
+.detail-wrap {
+  background: #0a0c10;
+  border-radius: 16px;
+  padding: 16px;
+  margin-top: 12px;
+  min-height: 120px;
+}
+.detail-title {
+  font-family: "Bahnschrift","Segoe UI",sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.detail-field {
+  background: var(--panel3);
+  border-radius: 10px;
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+.detail-field .key { color: var(--muted); }
+.detail-field .val { color: var(--text); font-weight: 700; }
+.section-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  margin: 10px 0 6px;
+}
+.section-label.blue { color: var(--info); }
+
+.mini-list { overflow-y: auto; max-height: 100px; display: flex; flex-direction: column; gap: 4px; }
+.mini-item {
+  background: var(--panel3);
+  border-radius: 9px;
+  padding: 6px 12px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--muted);
+}
+.mini-item span:last-child { color: var(--text); }
+
+/* ──────── EMPTY / LOADING ──────── */
+.empty-msg { color: var(--muted); font-size: 13px; padding: 16px 0; text-align: center; }
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  padding: 30px 0;
+}
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,0.1);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ──────── TOAST ──────── */
+#toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  padding: 12px 22px;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  opacity: 0;
+  transition: opacity .3s;
+  z-index: 999;
+  pointer-events: none;
+}
+#toast.show { opacity: 1; }
+#toast.ok-toast { background: #1a4d46; border: 1px solid var(--ok); }
+#toast.err-toast { background: #4d1a1a; border: 1px solid var(--error); }
+
+/* ──────── DIVIDER ──────── */
+.divider { height: 1px; background: var(--border); margin: 14px 0; }
+
+/* ──────── EXPORT BUTTONS ──────── */
+.export-row { display: flex; gap: 8px; margin-top: 12px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="topbar-brand">&#9830; Casino La Rioja</span>
+  <div class="topbar-actions">
+    <a href="/" style="text-decoration:none">
+      <button class="btn btn-ghost btn-sm">&#8592; Pagina de entrada</button>
+    </a>
+    <button class="btn btn-ghost btn-sm" id="btnRefresh">&#8634; Actualizar</button>
+  </div>
+</div>
+
+<div class="container">
+  <h1 class="page-title">Dashboard de asistencia</h1>
+  <p class="page-subtitle">Consulta el movimiento por fecha, observa el top de clientes y busca al cliente para ver su detalle diario.</p>
+
+  <!-- METRICAS -->
+  <div class="metrics-row">
+    <div class="metric-card">
+      <div class="metric-label">Clientes registrados</div>
+      <div class="metric-value" id="mClientes" style="color:var(--text)">—</div>
+      <div class="metric-desc">Base general</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Visitas hoy</div>
+      <div class="metric-value" id="mVisitas" style="color:var(--gold)">—</div>
+      <div class="metric-desc">Entradas del dia</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Clientes unicos hoy</div>
+      <div class="metric-value" id="mUnicos" style="color:var(--info)">—</div>
+      <div class="metric-desc">Personas diferentes</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Clientes VIP</div>
+      <div class="metric-value" id="mVip" style="color:var(--ok)">—</div>
+      <div class="metric-desc" id="mClasicaDesc">Clasica: —</div>
+    </div>
+  </div>
+
+  <!-- GRID PRINCIPAL -->
+  <div class="main-grid">
+
+    <!-- IZQUIERDA: Grafico + Tabla -->
+    <div class="card">
+      <div class="card-title">Asistencias por dia</div>
+      <div class="card-sub">Ultimos 7 dias con total de visitas y clientes unicos.</div>
+      <canvas id="grafico"></canvas>
+      <div class="tabla-wrap">
+        <table>
+          <thead><tr><th>Fecha</th><th>Visitas</th><th>Clientes unicos</th></tr></thead>
+          <tbody id="tablaHistorico">
+            <tr><td colspan="3"><div class="loading"><div class="spinner"></div>Cargando...</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="export-row">
+        <button class="btn btn-gold btn-sm" onclick="exportar('excel')">&#128202; Exportar Excel</button>
+        <button class="btn btn-ghost btn-sm" style="border-color:rgba(199,31,55,.4);color:var(--accent)" onclick="exportar('pdf')">&#128441; Exportar PDF</button>
+      </div>
+    </div>
+
+    <!-- CENTRO: Ranking + Entradas del dia -->
+    <div class="card">
+      <div class="card-title">Ranking y actividad del dia</div>
+      <div class="card-sub">Clientes con mayor asistencia y ultimos ingresos del dia.</div>
+
+      <div style="font-size:12px;font-weight:700;color:var(--gold);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px">Top clientes</div>
+      <div class="item-list h200" id="listaTop">
+        <div class="loading"><div class="spinner"></div>Cargando...</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div style="font-size:12px;font-weight:700;color:var(--info);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px">Entradas de hoy</div>
+      <div class="item-list h240" id="listaHoy">
+        <div class="loading"><div class="spinner"></div>Cargando...</div>
+      </div>
+    </div>
+
+    <!-- DERECHA: Buscar cliente + Detalle -->
+    <div class="card">
+      <div class="card-title">Buscar cliente</div>
+      <div class="card-sub">Busca por nombre o identificacion y revisa sus asistencias del dia y su historico.</div>
+      <div class="search-row">
+        <input class="search-input" id="inputBusqueda" placeholder="Nombre o DNI" autocomplete="off">
+        <button class="btn btn-accent btn-sm" id="btnBuscar">Buscar</button>
+      </div>
+      <div class="item-list h200" id="listaResultados">
+        <div class="empty-msg">Escribe para buscar clientes.</div>
+      </div>
+      <div class="detail-wrap" id="detalleCliente">
+        <div class="empty-msg">Selecciona un cliente para ver su detalle.</div>
+      </div>
+    </div>
+
+  </div><!-- /main-grid -->
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── CONFIGURACION DE API ──────────────────────────────────────────────
+// Si accedes desde localhost, usa localhost.
+// Si accedes desde internet (GitHub Pages u otro), cambia la URL por la publica:
+// Ejemplo con ngrok: "https://abc123.ngrok.io"
+// Ejemplo con Render: "https://mi-api-casino.onrender.com"
+const API_BASE = (window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost")
+  ? "http://127.0.0.1:5000"
+  : "https://TU_API_PUBLICA_AQUI"; // <-- cambia esto cuando subas la API a internet
+// ─────────────────────────────────────────────────────────────────────
+
+let datosGlobal = null;
+let clienteSeleccionadoId = null;
+
+// ────────────────────────────── TOAST ────
+function toast(msg, tipo = "ok") {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.className = tipo === "ok" ? "show ok-toast" : "show err-toast";
+  setTimeout(() => { el.className = ""; }, 3200);
+}
+
+// ────────────────────────────── FETCH DATOS ────
+async function cargarDashboard() {
+  try {
+    const res = await fetch(`${API_BASE}/dashboard/resumen`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    datosGlobal = data;
+    renderMetricas(data.estadisticas);
+    renderGrafico(data.historico);
+    renderTablaHistorico(data.historico);
+    renderTopClientes(data.top_clientes);
+    renderClientesHoy(data.clientes_hoy);
+  } catch(e) {
+    toast("No se pudo conectar con la API. Verifica que esté corriendo.", "err");
+    console.error(e);
+  }
+}
+
+// ── METRICAS ───────────────────────────────────────────────────────────
+function renderMetricas(stats) {
+  document.getElementById("mClientes").textContent = stats.total_clientes;
+  document.getElementById("mVisitas").textContent  = stats.visitas_hoy;
+  document.getElementById("mUnicos").textContent   = stats.clientes_unicos_hoy;
+  document.getElementById("mVip").textContent      = stats.total_vip;
+  document.getElementById("mClasicaDesc").textContent = `Clasica: ${stats.total_clasica}`;
+}
+
+// ── GRAFICO ────────────────────────────────────────────────────────────
+function renderGrafico(historico) {
+  const canvas = document.getElementById("grafico");
+  const ctx    = canvas.getContext("2d");
+  const dpr    = window.devicePixelRatio || 1;
+  const rect   = canvas.getBoundingClientRect();
+
+  canvas.width  = rect.width  * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+
+  const w  = rect.width;
+  const h  = rect.height;
+  const mx = 44, my = 18, mb = 38;
+  const baseY = h - mb;
+  const plotW = w - mx * 2;
+  const plotH = baseY - my;
+
+  ctx.clearRect(0, 0, w, h);
+  ctx.strokeStyle = "#2a3040";
+  ctx.lineWidth = 1;
+
+  // ejes
+  ctx.beginPath(); ctx.moveTo(mx, my); ctx.lineTo(mx, baseY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(mx, baseY); ctx.lineTo(w - mx, baseY); ctx.stroke();
+
+  if (!historico || historico.length === 0) {
+    ctx.fillStyle = "#9ea7b3";
+    ctx.font = "13px Segoe UI";
+    ctx.textAlign = "center";
+    ctx.fillText("Sin asistencias registradas.", w / 2, h / 2);
+    return;
+  }
+
+  const maximo = Math.max(...historico.map(r => r.total_visitas), 1);
+  const paso   = plotW / historico.length;
+  const barra  = Math.min(42, paso * 0.55);
+
+  historico.forEach((fila, i) => {
+    const cx = mx + paso * i + paso / 2;
+    const alt = (fila.total_visitas / maximo) * (plotH - 10);
+    const x0  = cx - barra / 2;
+    const y0  = baseY - alt;
+
+    // sombra barra
+    ctx.fillStyle = "rgba(199,31,55,0.25)";
+    ctx.beginPath();
+    ctx.roundRect(x0 + 2, y0 + 4, barra, alt, 5);
+    ctx.fill();
+
+    // barra principal
+    ctx.fillStyle = "#c71f37";
+    ctx.beginPath();
+    ctx.roundRect(x0, y0, barra, alt, 5);
+    ctx.fill();
+
+    // valor encima
+    ctx.fillStyle = "#f2f4f7";
+    ctx.font = "bold 11px Segoe UI";
+    ctx.textAlign = "center";
+    ctx.fillText(fila.total_visitas, cx, y0 - 7);
+
+    // etiqueta fecha
+    ctx.fillStyle = "#9ea7b3";
+    ctx.font = "10px Segoe UI";
+    const fecha = fila.fecha ? fila.fecha.substring(5) : ""; // MM-DD
+    const [, mm, dd] = fila.fecha ? fila.fecha.split("-") : ["","",""];
+    ctx.fillText(`${dd}/${mm}`, cx, baseY + 20);
+  });
+}
+
+// ── TABLA HISTORICO ────────────────────────────────────────────────────
+function renderTablaHistorico(historico) {
+  const tbody = document.getElementById("tablaHistorico");
+  if (!historico || historico.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="3"><div class="empty-msg">Sin datos.</div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = historico.map(f => {
+    const [anio, mm, dd] = f.fecha.split("-");
+    return `<tr>
+      <td>${dd}/${mm}/${anio}</td>
+      <td class="highlight-gold">${f.total_visitas}</td>
+      <td class="highlight-info">${f.clientes_unicos}</td>
+    </tr>`;
+  }).join("");
+}
+
+// ── TOP CLIENTES ───────────────────────────────────────────────────────
+function renderTopClientes(lista) {
+  const el = document.getElementById("listaTop");
+  if (!lista || lista.length === 0) {
+    el.innerHTML = '<div class="empty-msg">Sin datos.</div>'; return;
+  }
+  el.innerHTML = lista.map((c, i) => `
+    <div class="list-item" onclick="seleccionarCliente(${c.id}, this)">
+      <div class="list-item-title">${i+1}. ${c.nombre} <span class="badge badge-${c.nivel === 'VIP' ? 'vip' : 'clasica'}">${c.nivel}</span></div>
+      <div class="list-item-sub">${c.total_dias} dias | ${c.total_registros} registros</div>
+    </div>`).join("");
+}
+
+// ── CLIENTES HOY ───────────────────────────────────────────────────────
+function renderClientesHoy(lista) {
+  const el = document.getElementById("listaHoy");
+  if (!lista || lista.length === 0) {
+    el.innerHTML = '<div class="empty-msg">No hay entradas hoy.</div>'; return;
+  }
+  el.innerHTML = lista.map(c => `
+    <div class="list-item" onclick="seleccionarCliente(${c.id}, this)">
+      <div class="list-item-title">${c.nombre} <span class="badge badge-${c.nivel === 'VIP' ? 'vip' : 'clasica'}">${c.nivel}</span></div>
+      <div class="list-item-sub">${c.visitas_hoy} visitas &nbsp;|&nbsp; Ultima: ${c.ultima_entrada || '—'}</div>
+    </div>`).join("");
+}
+
+// ── SELECCIONAR CLIENTE ────────────────────────────────────────────────
+async function seleccionarCliente(id, elemClicado) {
+  clienteSeleccionadoId = id;
+  document.querySelectorAll(".list-item.active").forEach(el => el.classList.remove("active"));
+  if (elemClicado) elemClicado.classList.add("active");
+
+  const detalle = document.getElementById("detalleCliente");
+  detalle.innerHTML = '<div class="loading"><div class="spinner"></div>Cargando detalle...</div>';
+
+  try {
+    const res  = await fetch(`${API_BASE}/dashboard/clientes/${id}`);
+    const data = await res.json();
+    renderDetalle(data);
+  } catch(e) {
+    detalle.innerHTML = '<div class="empty-msg">Error al cargar el detalle.</div>';
+  }
+}
+
+function renderDetalle(data) {
+  const r = data.resumen;
+  const asistencias = data.asistencias_por_dia || [];
+  const movimientos = data.movimientos_hoy || [];
+
+  const fieldsHtml = [
+    ["DNI",             r.dni],
+    ["Nivel",           r.nivel],
+    ["Tarjeta",         r.tarjeta],
+    ["Dias asistidos",  r.total_dias],
+    ["Registros",       r.total_registros],
+    ["Visitas hoy",     r.visitas_hoy || 0]
+  ].map(([k,v]) => `<div class="detail-field"><span class="key">${k}</span><span class="val">${v}</span></div>`).join("");
+
+  const asistHtml = asistencias.length
+    ? asistencias.map(a => {
+        const [anio,mm,dd] = a.fecha.split("-");
+        return `<div class="mini-item"><span>${dd}/${mm}/${anio}</span><span>${a.visitas} visitas</span></div>`;
+      }).join("")
+    : '<div class="empty-msg">Sin asistencias registradas.</div>';
+
+  const movHtml = movimientos.length
+    ? movimientos.map(m => `<div class="mini-item"><span>Entrada</span><span>${m.hora}</span></div>`).join("")
+    : '<div class="empty-msg">Sin entradas hoy.</div>';
+
+  document.getElementById("detalleCliente").innerHTML = `
+    <div class="detail-title">${r.nombre}</div>
+    <div class="detail-grid">${fieldsHtml}</div>
+    <div class="section-label">Asistencia por dia</div>
+    <div class="mini-list">${asistHtml}</div>
+    <div class="section-label blue">Movimientos de hoy</div>
+    <div class="mini-list">${movHtml}</div>
+  `;
+}
+
+// ── BUSQUEDA ───────────────────────────────────────────────────────────
+async function buscarClientes() {
+  const q = document.getElementById("inputBusqueda").value.trim();
+  const el = document.getElementById("listaResultados");
+
+  el.innerHTML = '<div class="loading"><div class="spinner"></div>Buscando...</div>';
+  try {
+    const res  = await fetch(`${API_BASE}/dashboard/clientes/buscar?q=${encodeURIComponent(q)}`);
+    const data = await res.json();
+    const lista = data.clientes || [];
+    if (!lista.length) {
+      el.innerHTML = '<div class="empty-msg">No se encontraron clientes.</div>'; return;
+    }
+    el.innerHTML = lista.map(c => `
+      <div class="list-item" onclick="seleccionarCliente(${c.id}, this)">
+        <div class="list-item-title">${c.nombre} <span class="badge badge-${c.nivel === 'VIP' ? 'vip' : 'clasica'}">${c.nivel}</span></div>
+        <div class="list-item-sub">DNI ${c.dni}</div>
+      </div>`).join("");
+
+    if (lista.length > 0) seleccionarCliente(lista[0].id, el.querySelector(".list-item"));
+  } catch(e) {
+    el.innerHTML = '<div class="empty-msg">Error al buscar.</div>';
+  }
+}
+
+// ── EXPORTAR ───────────────────────────────────────────────────────────
+function exportar(tipo) {
+  const param = clienteSeleccionadoId ? `?cliente_id=${clienteSeleccionadoId}` : "";
+  window.open(`${API_BASE}/dashboard/export/${tipo}${param}`, "_blank");
+  toast(`Exportando ${tipo === "excel" ? "Excel" : "PDF"}...`);
+}
+
+// ── EVENTOS ────────────────────────────────────────────────────────────
+document.getElementById("btnBuscar").addEventListener("click", buscarClientes);
+document.getElementById("inputBusqueda").addEventListener("keydown", e => {
+  if (e.key === "Enter") buscarClientes();
+});
+document.getElementById("btnRefresh").addEventListener("click", () => {
+  toast("Actualizando dashboard...");
+  cargarDashboard().then(() => {
+    renderGrafico(datosGlobal?.historico || []);
+    toast("Dashboard actualizado.");
+  });
+});
+
+// redibuja el grafico si cambia el tamano de ventana
+window.addEventListener("resize", () => {
+  if (datosGlobal) renderGrafico(datosGlobal.historico);
+});
+
+// cargar al iniciar
+cargarDashboard();
+// tambien lanzar busqueda inicial para mostrar todos los clientes
+setTimeout(() => {
+  document.getElementById("inputBusqueda").value = "";
+  buscarClientes();
+}, 500);
+</script>
+</body>
+</html>

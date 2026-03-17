@@ -1,142 +1,208 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Asistencia - Casino La Rioja</title>
-    <style>
-        /* Estilo fusionado: Moderno y con Feedback visual */
-        body { 
-            font-family: 'Segoe UI', Arial, sans-serif; 
-            background: #141414; 
-            color: white; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
-        }
-        .card { 
-            background: #000; 
-            padding: 40px; 
-            border: 2px solid red; 
-            border-radius: 15px; 
-            text-align: center; 
-            width: 350px; 
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.2); /* Efecto neón suave */
-        }
-        h2 { color: red; letter-spacing: 2px; margin-bottom: 5px; }
-        p { color: #ccc; font-size: 14px; margin-bottom: 25px; }
-        
-        input { 
-            width: 100%; 
-            padding: 15px; 
-            margin-bottom: 20px; 
-            border-radius: 8px; 
-            border: 1px solid #333; 
-            background: #111; 
-            color: white; 
-            font-size: 18px; 
-            text-align: center; 
-            box-sizing: border-box; 
-            transition: 0.3s;
-        }
-        input:focus { border-color: red; outline: none; background: #1a1a1a; }
-        
-        button { 
-            width: 100%; 
-            padding: 15px; 
-            background: red; 
-            color: white; 
-            border: none; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            font-size: 16px;
-            transition: 0.3s; 
-        }
-        button:hover { background: #8b0000; transform: scale(1.02); }
-        button:active { transform: scale(0.98); }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Casino La Rioja | Registro de Entrada</title>
+<style>
+:root {
+  --bg: #08090d;
+  --panel: rgba(18, 21, 29, 0.9);
+  --panel-2: rgba(12, 14, 20, 0.9);
+  --border: rgba(255, 255, 255, 0.09);
+  --text: #f2f4f7;
+  --muted: #98a2b3;
+  --accent: #c61e39;
+  --accent-2: #8e1428;
+  --gold: #d2ad67;
+  --ok: #6fd0be;
+  --error: #ff6a6a;
+}
 
-        #mensaje { 
-            margin-top: 25px; 
-            font-weight: bold; 
-            min-height: 24px; 
-            font-size: 15px;
-        }
-    </style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  color: var(--text);
+  font-family: "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(198, 30, 57, 0.22), transparent 34%),
+    radial-gradient(circle at 90% 80%, rgba(110, 155, 255, 0.14), transparent 28%),
+    linear-gradient(140deg, #06070a 0%, #0b0d12 45%, #121621 100%);
+}
+
+.card {
+  width: min(520px, 100%);
+  border-radius: 28px;
+  border: 1px solid var(--border);
+  background: linear-gradient(145deg, var(--panel), var(--panel-2));
+  padding: 34px 28px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.48);
+}
+
+.eyebrow {
+  display: inline-block;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--gold);
+  letter-spacing: 0.16em;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 18px 0 8px;
+  font-family: "Bahnschrift", "Segoe UI", sans-serif;
+  font-size: clamp(32px, 5vw, 44px);
+  line-height: 1;
+}
+
+p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.form {
+  margin-top: 26px;
+  display: grid;
+  gap: 12px;
+}
+
+input {
+  width: 100%;
+  height: 52px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(8, 10, 15, 0.86);
+  color: var(--text);
+  font-size: 20px;
+  text-align: center;
+  outline: none;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+input:focus {
+  border-color: rgba(198, 30, 57, 0.7);
+  box-shadow: 0 0 0 4px rgba(198, 30, 57, 0.15);
+}
+
+button {
+  height: 52px;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  color: #fff;
+  font-family: "Bahnschrift", "Segoe UI", sans-serif;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  transition: transform .18s ease, filter .18s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+.status {
+  margin-top: 14px;
+  min-height: 60px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  padding: 14px 16px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.status.ok {
+  color: var(--ok);
+  border-color: rgba(111, 208, 190, 0.35);
+}
+
+.status.error {
+  color: var(--error);
+  border-color: rgba(255, 106, 106, 0.35);
+}
+</style>
 </head>
 <body>
-    <div class="card">
-        <h2>CASINO LA RIOJA</h2>
-        <p>CONTROL DE ASISTENCIA</p>
-        
-        <input type="text" id="dni" placeholder="Número de documento" autocomplete="off">
-        <button onclick="validar()">VERIFICAR ENTRADA</button>
-        
-        <div id="mensaje"></div>
+  <main class="card">
+    <span class="eyebrow">Casino La Rioja</span>
+    <h1>Registrar entrada</h1>
+    <p>Ingresa tu número de documento para validar tu acceso.</p>
+
+    <div class="form">
+      <input id="dni" placeholder="Número de documento" autocomplete="off">
+      <button id="btnValidar">Verificar entrada</button>
     </div>
 
-    <script>
-        // 1. Manejo Dinámico de la URL (API_BASE)
-        const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-            ? 'http://localhost:5000'
-            : 'https://tu-backend-produccion.com'; // Ajustar para despliegue real
+    <div id="estado" class="status">Listo para validar ingreso.</div>
+  </main>
 
-        async function validar() {
-            const dniInput = document.getElementById('dni');
-            const dni = dniInput.value;
-            const resDiv = document.getElementById('mensaje');
-            
-            if (!dni) {
-                resDiv.style.color = "orange";
-                resDiv.innerText = "Por favor, ingrese un documento.";
-                return;
-            }
+<script>
+// ── CONFIGURACION DE API ──────────────────────────────────────────────
+// Cuando la página está en localhost, usa el servidor local automáticamente.
+// Cuando está en GitHub Pages (o internet), necesitas poner la URL pública de tu API.
+// Opciones para hacer la API pública:
+//   1. ngrok:  ejecuta "ngrok http 5000" y copia la URL que te da (ej: https://abc123.ngrok.io)
+//   2. Render: sube la API a render.com gratis y pon la URL aquí
+//   3. IP pública: si tienes IP fija pon http://TU_IP:5000 (requiere abrir puerto en router)
+const API_BASE = (window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost")
+  ? "http://127.0.0.1:5000"
+  : "https://TU_API_PUBLICA_AQUI"; // <-- cambia esto por tu URL pública
+// ─────────────────────────────────────────────────────────────────────
+const estado = document.getElementById("estado");
+const dni = document.getElementById("dni");
 
-            try {
-                const response = await fetch(`${API_BASE}/validar`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({identificacion: dni})
-                });
-                
-                const data = await response.json();
-                
-                // 2. Experiencia de Usuario y Feedback
-                if(data.status === 'success') {
-                    resDiv.style.color = "lime";
-                    resDiv.innerText = data.message;
-                    
-                    // Limpieza automática para el siguiente cliente
-                    setTimeout(() => {
-                        dniInput.value = "";
-                        resDiv.innerText = "";
-                    }, 4000); 
+function mostrarEstado(mensaje, tipo = "") {
+  estado.textContent = mensaje;
+  estado.className = `status ${tipo}`.trim();
+}
 
-                } else {
-                    resDiv.style.color = "orange";
-                    resDiv.innerText = data.message;
-                    
-                    // Si no existe, sugerir registro después de 2 segundos
-                    setTimeout(() => {
-                        if(confirm("El cliente no existe. ¿Desea ir al formulario de registro?")) {
-                            // Aquí puedes cambiar a la URL de tu pestaña de registro si fuera externa
-                            console.log("Redirigiendo a registro...");
-                        }
-                    }, 2000);
-                }
-            } catch (e) {
-                resDiv.style.color = "red";
-                resDiv.innerText = "Error: El servidor no responde.";
-            }
-        }
+async function validarEntrada() {
+  const documento = dni.value.trim();
+  if (!documento) {
+    mostrarEstado("Ingresa un número de documento.", "error");
+    return;
+  }
 
-        // Permitir marcar entrada al presionar "Enter"
-        document.getElementById('dni').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                validar();
-            }
-        });
-    </script>
+  mostrarEstado(`Validando documento ${documento}...`);
+
+  try {
+    const response = await fetch(`${API_BASE}/validar`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ identificacion: documento })
+    });
+    const data = await response.json();
+
+    if (!response.ok || data.status === "error") {
+      throw new Error(data.message || "No se pudo registrar la entrada");
+    }
+
+    mostrarEstado(data.message, "ok");
+    dni.value = "";
+    dni.focus();
+  } catch (error) {
+    mostrarEstado(error.message, "error");
+  }
+}
+
+document.getElementById("btnValidar").addEventListener("click", validarEntrada);
+dni.addEventListener("keydown", event => {
+  if (event.key === "Enter") validarEntrada();
+});
+</script>
 </body>
 </html>
