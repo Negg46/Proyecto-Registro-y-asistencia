@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -206,3 +207,203 @@ dni.addEventListener("keydown", event => {
 </script>
 </body>
 </html>
+=======
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Casino La Rioja | Registro de Entrada</title>
+<style>
+:root {
+  --bg: #08090d;
+  --panel: rgba(18, 21, 29, 0.9);
+  --panel-2: rgba(12, 14, 20, 0.9);
+  --border: rgba(255, 255, 255, 0.09);
+  --text: #f2f4f7;
+  --muted: #98a2b3;
+  --accent: #c61e39;
+  --accent-2: #8e1428;
+  --gold: #d2ad67;
+  --ok: #6fd0be;
+  --error: #ff6a6a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  color: var(--text);
+  font-family: "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(198, 30, 57, 0.22), transparent 34%),
+    radial-gradient(circle at 90% 80%, rgba(110, 155, 255, 0.14), transparent 28%),
+    linear-gradient(140deg, #06070a 0%, #0b0d12 45%, #121621 100%);
+}
+
+.card {
+  width: min(520px, 100%);
+  border-radius: 28px;
+  border: 1px solid var(--border);
+  background: linear-gradient(145deg, var(--panel), var(--panel-2));
+  padding: 34px 28px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.48);
+}
+
+.eyebrow {
+  display: inline-block;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--gold);
+  letter-spacing: 0.16em;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 18px 0 8px;
+  font-family: "Bahnschrift", "Segoe UI", sans-serif;
+  font-size: clamp(32px, 5vw, 44px);
+  line-height: 1;
+}
+
+p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.form {
+  margin-top: 26px;
+  display: grid;
+  gap: 12px;
+}
+
+input {
+  width: 100%;
+  height: 52px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(8, 10, 15, 0.86);
+  color: var(--text);
+  font-size: 20px;
+  text-align: center;
+  outline: none;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+input:focus {
+  border-color: rgba(198, 30, 57, 0.7);
+  box-shadow: 0 0 0 4px rgba(198, 30, 57, 0.15);
+}
+
+button {
+  height: 52px;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  color: #fff;
+  font-family: "Bahnschrift", "Segoe UI", sans-serif;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  transition: transform .18s ease, filter .18s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+.status {
+  margin-top: 14px;
+  min-height: 60px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  padding: 14px 16px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.status.ok {
+  color: var(--ok);
+  border-color: rgba(111, 208, 190, 0.35);
+}
+
+.status.error {
+  color: var(--error);
+  border-color: rgba(255, 106, 106, 0.35);
+}
+</style>
+</head>
+<body>
+  <main class="card">
+    <span class="eyebrow">Casino La Rioja</span>
+    <h1>Registrar entrada</h1>
+    <p>Ingresa tu número de documento para validar tu acceso.</p>
+
+    <div class="form">
+      <input id="dni" placeholder="Número de documento" autocomplete="off">
+      <button id="btnValidar">Verificar entrada</button>
+    </div>
+
+    <div id="estado" class="status">Listo para validar ingreso.</div>
+  </main>
+
+<script>
+const API_BASE = window.location.origin.startsWith("http") ? window.location.origin : "http://127.0.0.1:5000";
+const estado = document.getElementById("estado");
+const dni = document.getElementById("dni");
+
+function mostrarEstado(mensaje, tipo = "") {
+  estado.textContent = mensaje;
+  estado.className = `status ${tipo}`.trim();
+}
+
+async function validarEntrada() {
+  const documento = dni.value.trim();
+  if (!documento) {
+    mostrarEstado("Ingresa un número de documento.", "error");
+    return;
+  }
+
+  mostrarEstado(`Validando documento ${documento}...`);
+
+  try {
+    const response = await fetch(`${API_BASE}/validar`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ identificacion: documento })
+    });
+    const data = await response.json();
+
+    if (!response.ok || data.status === "error") {
+      throw new Error(data.message || "No se pudo registrar la entrada");
+    }
+
+    mostrarEstado(data.message, "ok");
+    dni.value = "";
+    dni.focus();
+  } catch (error) {
+    mostrarEstado(error.message, "error");
+  }
+}
+
+document.getElementById("btnValidar").addEventListener("click", validarEntrada);
+dni.addEventListener("keydown", event => {
+  if (event.key === "Enter") validarEntrada();
+});
+</script>
+</body>
+</html>
+>>>>>>> 3f990cd8455228fd914bcd7acba1dfc3b180fa8d
