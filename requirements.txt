@@ -1,5 +1,22 @@
 # Dependencias del proyecto
-# Nota: tkinter viene incluido con Python (asegúrate de instalar Python con soporte GUI)
+# Nota: tkinter viene incluido con Python (asegurate de instalar Python con soporte GUI)
+#
+# Enlaces oficiales de librerias usadas:
+# customtkinter: https://github.com/TomSchimansky/CustomTkinter
+# Flask: https://flask.palletsprojects.com/
+# Flask-Cors: https://flask-cors.readthedocs.io/
+# mysql-connector-python: https://dev.mysql.com/doc/connector-python/en/
+# Pillow: https://python-pillow.org/
+# openpyxl: https://openpyxl.readthedocs.io/
+# reportlab: https://www.reportlab.com/dev/docs/
+# gunicorn: https://gunicorn.org/
+#
+# Herramientas/servicios externos usados en este proyecto:
+# GitHub: https://github.com/
+# GitHub Pages: https://pages.github.com/
+# Render: https://render.com/
+# MySQL: https://www.mysql.com/
+# FreeSQLDatabase: https://www.freesqldatabase.com/
 
 customtkinter
 Flask
