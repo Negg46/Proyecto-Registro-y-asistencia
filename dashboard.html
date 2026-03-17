@@ -583,9 +583,14 @@ async function seleccionarCliente(id, elemClicado) {
 }
 
 function renderDetalle(data) {
-  const r = data.resumen;
-  const asistencias = data.asistencias_por_dia || [];
+  const r = data.resumen || data.cliente;
+  const asistencias = data.asistencias_por_dia || data.asistencias || [];
   const movimientos = data.movimientos_hoy || [];
+
+  if (!r) {
+    document.getElementById("detalleCliente").innerHTML = '<div class="empty-msg">No se pudo cargar el detalle del cliente.</div>';
+    return;
+  }
 
   const fieldsHtml = [
     ["DNI",             r.dni],
@@ -626,7 +631,7 @@ async function buscarClientes() {
   try {
     const res  = await fetch(`${API_BASE}/dashboard/clientes/buscar?q=${encodeURIComponent(q)}`);
     const data = await res.json();
-    const lista = data.clientes || [];
+    const lista = Array.isArray(data) ? data : (data.clientes || []);
     if (!lista.length) {
       el.innerHTML = '<div class="empty-msg">No se encontraron clientes.</div>'; return;
     }
