@@ -40,14 +40,30 @@ class Registro_datos:
         except ValueError:
             port = 3306
 
-        self.server_config = {'host': host, 'user': user, 'password': password, 'port': port}
+        self.server_config = {'host': host, 'user': user, 'password': password, 'port': port, 'connect_timeout': 10}
         self.database_name = dbname
         self.config = {**self.server_config, 'database': self.database_name}
+        self._limpiar_host_cache()
         self.asegurar_base_datos()
         self.crear_tablas()
         self.normalizar_esquema()
         self.insertar_datos_demo_si_vacio()
         self.recalcular_asistencias_y_niveles()
+
+    def _limpiar_host_cache(self):
+        """Borra la cache de hosts bloqueados (error 1129) cuando el servidor es local."""
+        host = self.server_config.get('host', 'localhost')
+        if host not in ('localhost', '127.0.0.1', '::1'):
+            return
+        try:
+            con = mysql.connector.connect(**{**self.server_config, 'connect_timeout': 3})
+            cursor = con.cursor()
+            cursor.execute('TRUNCATE TABLE performance_schema.host_cache')
+            con.commit()
+            cursor.close()
+            con.close()
+        except Exception:
+            pass
 
     def asegurar_base_datos(self):
         # En servicios remotos (Render) la BD ya existe; CREATE DATABASE puede no tener permisos
