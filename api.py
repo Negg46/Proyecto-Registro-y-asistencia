@@ -322,4 +322,8 @@ def exportar_dashboard_pdf():
         return jsonify({"status": "error", "message": str(error)}), 500
 
 if __name__ == "__main__":
-    app.run(port=5000, debug=True)
+    import os
+    # Captura el puerto que Render asigna, si no existe usa el 10000
+    port = int(os.environ.get("PORT", 10000))
+    # Importante: host='0.0.0.0' para que sea accesible desde internet
+    app.run(host='0.0.0.0', port=port)
