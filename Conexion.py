@@ -111,11 +111,31 @@ class Registro_datos:
             """
         )
 
+    def _crear_tabla_actividad_operador(self, cursor):
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS actividad_operador(
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                usuario VARCHAR(60) NOT NULL,
+                rol VARCHAR(30) NOT NULL,
+                accion VARCHAR(80) NOT NULL,
+                cliente_id INT NULL,
+                detalle VARCHAR(255) NULL,
+                fecha DATE NOT NULL,
+                hora TIME NOT NULL,
+                INDEX idx_actividad_usuario_fecha (usuario, fecha),
+                INDEX idx_actividad_rol_fecha (rol, fecha),
+                INDEX idx_actividad_cliente (cliente_id)
+            ) ENGINE=InnoDB
+            """
+        )
+
     def crear_tablas(self):
         con = self.conectar()
         cursor = con.cursor()
         self._crear_tabla_clientes(cursor)
         self._crear_tabla_asistencias(cursor)
+        self._crear_tabla_actividad_operador(cursor)
         con.commit()
         cursor.close()
         con.close()
@@ -590,6 +610,125 @@ class Registro_datos:
             LIMIT %s
             """,
             (limite,)
+        )
+        resultado = cursor.fetchall()
+        cursor.close()
+        con.close()
+        return resultado
+
+    def obtener_actividad_todos_operadores(self):
+        con = self.conectar()
+        cursor = con.cursor(dictionary=True)
+        cursor.execute(
+            """
+            SELECT
+                usuario,
+                rol,
+                SUM(CASE WHEN fecha = CURDATE() THEN 1 ELSE 0 END) AS hoy,
+                SUM(CASE WHEN YEAR(fecha) = YEAR(CURDATE()) AND MONTH(fecha) = MONTH(CURDATE()) THEN 1 ELSE 0 END) AS mes,
+                SUM(CASE WHEN YEAR(fecha) = YEAR(CURDATE()) THEN 1 ELSE 0 END) AS anio,
+                COUNT(*) AS total_historico,
+                MAX(CONCAT(fecha, ' ', hora)) AS ultima_accion
+            FROM actividad_operador
+            GROUP BY usuario, rol
+            ORDER BY hoy DESC, mes DESC
+            """
+        )
+        resultado = cursor.fetchall()
+        cursor.close()
+        con.close()
+        return resultado
+
+    def obtener_ultimas_acciones_todas(self, limite=12):
+        con = self.conectar()
+        cursor = con.cursor(dictionary=True)
+        cursor.execute(
+            """
+            SELECT usuario, rol, accion, detalle, fecha, hora
+            FROM actividad_operador
+            ORDER BY fecha DESC, hora DESC
+            LIMIT %s
+            """,
+            (limite,)
+        )
+        resultado = cursor.fetchall()
+        cursor.close()
+        con.close()
+        return resultado
+
+    def registrar_actividad_operador(self, usuario, rol, accion, cliente_id=None, detalle=''):
+        if not usuario or not rol:
+            return
+
+        ahora = datetime.now()
+        con = self.conectar()
+        cursor = con.cursor()
+        cursor.execute(
+            """
+            INSERT INTO actividad_operador (usuario, rol, accion, cliente_id, detalle, fecha, hora)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """,
+            (usuario, rol, accion, cliente_id, detalle, ahora.date(), ahora.time().replace(microsecond=0))
+        )
+        con.commit()
+        cursor.close()
+        con.close()
+
+    def obtener_resumen_actividad_operador(self, usuario, rol):
+        con = self.conectar()
+        cursor = con.cursor(dictionary=True)
+        cursor.execute(
+            """
+            SELECT
+                SUM(CASE WHEN fecha = CURDATE() THEN 1 ELSE 0 END) AS registros_dia,
+                SUM(CASE WHEN YEAR(fecha) = YEAR(CURDATE()) AND MONTH(fecha) = MONTH(CURDATE()) THEN 1 ELSE 0 END) AS registros_mes,
+                SUM(CASE WHEN YEAR(fecha) = YEAR(CURDATE()) THEN 1 ELSE 0 END) AS registros_anio
+            FROM actividad_operador
+            WHERE usuario = %s AND rol = %s
+            """,
+            (usuario, rol)
+        )
+        resultado = cursor.fetchone() or {}
+        cursor.close()
+        con.close()
+        return {
+            'registros_dia': resultado.get('registros_dia') or 0,
+            'registros_mes': resultado.get('registros_mes') or 0,
+            'registros_anio': resultado.get('registros_anio') or 0
+        }
+
+    def obtener_actividad_operador_hoy(self, usuario, rol, limite=20):
+        con = self.conectar()
+        cursor = con.cursor(dictionary=True)
+        cursor.execute(
+            """
+            SELECT accion, detalle, hora
+            FROM actividad_operador
+            WHERE usuario = %s AND rol = %s AND fecha = CURDATE()
+            ORDER BY hora DESC
+            LIMIT %s
+            """,
+            (usuario, rol, limite)
+        )
+        resultado = cursor.fetchall()
+        cursor.close()
+        con.close()
+        return resultado
+
+    def obtener_actividad_operador_mes(self, usuario, rol):
+        con = self.conectar()
+        cursor = con.cursor(dictionary=True)
+        cursor.execute(
+            """
+            SELECT fecha, COUNT(*) AS total
+            FROM actividad_operador
+            WHERE usuario = %s AND rol = %s
+              AND YEAR(fecha) = YEAR(CURDATE())
+              AND MONTH(fecha) = MONTH(CURDATE())
+            GROUP BY fecha
+            ORDER BY fecha DESC
+            """,
+            (usuario, rol)
         )
         resultado = cursor.fetchall()
         cursor.close()
