@@ -3,15 +3,44 @@ import os
 from datetime import date, datetime, timedelta
 
 
+def _cargar_env_local():
+    """Carga variables desde un archivo .env en la raiz del proyecto.
+    No sobreescribe variables ya definidas en el sistema.
+    """
+    ruta_env = os.path.join(os.path.dirname(__file__), '.env')
+    if not os.path.exists(ruta_env):
+        return
+
+    with open(ruta_env, 'r', encoding='utf-8') as archivo:
+        for linea in archivo:
+            linea = linea.strip()
+            if not linea or linea.startswith('#') or '=' not in linea:
+                continue
+
+            clave, valor = linea.split('=', 1)
+            clave = clave.strip()
+            valor = valor.strip().strip('"').strip("'")
+
+            if clave and clave not in os.environ:
+                os.environ[clave] = valor
+
+
 class Registro_datos:
     def __init__(self):
+        _cargar_env_local()
+
         # En local toma los valores de entorno si existen, si no usa los defaults de desarrollo
         host     = os.environ.get('DB_HOST', 'localhost')
         user     = os.environ.get('DB_USER', 'root')
         password = os.environ.get('DB_PASS', '')
         dbname   = os.environ.get('DB_NAME', 'registro_casino')
+        port_txt = os.environ.get('DB_PORT', '3306')
+        try:
+            port = int(port_txt)
+        except ValueError:
+            port = 3306
 
-        self.server_config = {'host': host, 'user': user, 'password': password}
+        self.server_config = {'host': host, 'user': user, 'password': password, 'port': port}
         self.database_name = dbname
         self.config = {**self.server_config, 'database': self.database_name}
         self.asegurar_base_datos()
